@@ -78,19 +78,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 平滑滾動
+    // 平滑滾動（只處理頁面內連結）
     const navLinks = document.querySelectorAll('.nav-menu a');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
+            const href = this.getAttribute('href');
             
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth'
-                });
+            // 只處理以 # 開頭的錨點連結
+            if (href.startsWith('#')) {
+                e.preventDefault();
+                const targetId = href.substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             }
+            // 如果是外部連結或頁面連結，讓它正常跳轉
         });
     });
 
