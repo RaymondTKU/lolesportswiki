@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圖片路徑測試</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-box {
+            width: 100%;
+            height: 300px;
+            margin: 20px 0;
+            border: 2px solid #333;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+        .test1 {
+            background-image: url('images/lol-hero-bg.jpg');
+        }
+        .test2 {
+            background-image: url('../images/lol-hero-bg.jpg');
+        }
+        .test3 {
+            background-image: url('./images/lol-hero-bg.jpg');
+        }
+        .direct-img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #333;
+            margin: 20px 0;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .path-info {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #007acc;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>英雄聯盟背景圖片路徑測試</h1>
+        
+        <div class="path-info">
+            <strong>目前檔案結構:</strong><br>
+            index.html (根目錄)<br>
+            css/style.css (CSS檔案)<br>
+            images/lol-hero-bg.jpg (背景圖片)<br>
+            test.html (此測試檔案)
+        </div>
+        
+        <h2>測試1: 相對路徑 (從根目錄)</h2>
+        <div class="test-box test1">
+            <div>路徑: images/lol-hero-bg.jpg</div>
+        </div>
+        
+        <h2>測試2: 相對路徑 (從CSS檔案)</h2>
+        <div class="test-box test2">
+            <div>路徑: ../images/lol-hero-bg.jpg</div>
+        </div>
+        
+        <h2>測試3: 當前目錄路徑</h2>
+        <div class="test-box test3">
+            <div>路徑: ./images/lol-hero-bg.jpg</div>
+        </div>
+        
+        <h2>測試4: 直接使用 IMG 標籤</h2>
+        <img src="images/lol-hero-bg.jpg" alt="英雄聯盟背景圖片" class="direct-img">
+        
+        <div class="path-info">
+            <strong>如果圖片無法顯示，請檢查:</strong><br>
+            1. 圖片檔案是否存在於 images/ 資料夾<br>
+            2. 檔案名稱是否正確為 lol-hero-bg.jpg<br>
+            3. 圖片檔案是否損壞<br>
+            4. 瀏覽器是否有快取問題 (按 Ctrl+F5 強制重新載入)
+        </div>
+    </div>
+</body>
+</html>

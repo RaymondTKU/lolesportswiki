@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoL Esports Wiki API 測試頁面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1e3c72 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #c89b3c;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .api-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .api-section h2 {
+            color: #c89b3c;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #c89b3c;
+            padding-bottom: 5px;
+        }
+        
+        .api-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .api-item {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3c89d0;
+        }
+        
+        .api-item h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .api-item p {
+            color: #cccccc;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+        
+        .method.get { background: #28a745; }
+        .method.post { background: #007bff; }
+        .method.put { background: #ffc107; color: #000; }
+        .method.delete { background: #dc3545; }
+        
+        .endpoint {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .test-btn {
+            background: linear-gradient(45deg, #c89b3c, #f0e6d2);
+            color: #0f1419;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(200,155,60,0.3);
+        }
+        
+        .response-area {
+            background: rgba(0,0,0,0.7);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            min-height: 200px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-indicator.online { background: #28a745; }
+        .status-indicator.offline { background: #dc3545; }
+        .status-indicator.loading { background: #ffc107; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .server-status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        
+        .input-group {
+            margin-bottom: 10px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #c89b3c;
+            font-weight: bold;
+        }
+        
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .input-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-btn {
+            background: linear-gradient(45deg, #3c89d0, #0596aa);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(60,137,208,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 LoL Esports Wiki API 測試頁面</h1>
+        
+        <div class="server-status">
+            <h3><span class="status-indicator" id="serverStatus"></span>伺服器狀態：<span id="statusText">檢查中...</span></h3>
+        </div>
+        
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="checkServerStatus()">檢查伺服器狀態</button>
+            <button class="quick-btn" onclick="testLogin()">測試登入</button>
+            <button class="quick-btn" onclick="loadSampleData()">載入範例資料</button>
+            <button class="quick-btn" onclick="clearResponse()">清除回應</button>
+        </div>
+        
+        <!-- 認證相關 API -->
+        <div class="api-section">
+            <h2>🔐 認證相關 API</h2>
+            <div class="api-group">
+                <div class="api-item">
+                    <h3><span class="method post">POST</span><span class="endpoint">/api/auth/register</span></h3>
+                    <p>註冊新使用者</p>
+                    <div class="input-group">
+                        <label>Username:</label>
+                        <input type="text" id="regUsername" placeholder="使用者名稱">
+                    </div>
+                    <div class="input-group">
+                        <label>Email:</label>
+                        <input type="email" id="regEmail" placeholder="電子信箱">
+                    </div>
+                    <div class="input-group">
+                        <label>Password:</label>
+                        <input type="password" id="regPassword" placeholder="密碼">
+                    </div>
+                    <button class="test-btn" onclick="testRegister()">測試註冊</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method post">POST</span><span class="endpoint">/api/auth/login</span></h3>
+                    <p>使用者登入</p>
+                    <div class="input-group">
+                        <label>Username:</label>
+                        <input type="text" id="loginUsername" placeholder="使用者名稱">
+                    </div>
+                    <div class="input-group">
+                        <label>Password:</label>
+                        <input type="password" id="loginPassword" placeholder="密碼">
+                    </div>
+                    <button class="test-btn" onclick="testLogin()">測試登入</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/auth/me</span></h3>
+                    <p>獲取使用者資訊</p>
+                    <button class="test-btn" onclick="testGetMe()">測試獲取使用者資訊</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 隊伍相關 API -->
+        <div class="api-section">
+            <h2>🏆 隊伍相關 API</h2>
+            <div class="api-group">
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/teams</span></h3>
+                    <p>獲取隊伍列表</p>
+                    <button class="test-btn" onclick="testGetTeams()">測試獲取隊伍列表</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method post">POST</span><span class="endpoint">/api/teams</span></h3>
+                    <p>創建新隊伍</p>
+                    <div class="input-group">
+                        <label>隊伍名稱:</label>
+                        <input type="text" id="teamName" placeholder="隊伍名稱">
+                    </div>
+                    <div class="input-group">
+                        <label>地區:</label>
+                        <input type="text" id="teamRegion" placeholder="地區">
+                    </div>
+                    <div class="input-group">
+                        <label>成立年份:</label>
+                        <input type="number" id="teamYear" placeholder="成立年份">
+                    </div>
+                    <button class="test-btn" onclick="testCreateTeam()">測試創建隊伍</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/teams/regions</span></h3>
+                    <p>獲取所有地區列表</p>
+                    <button class="test-btn" onclick="testGetRegions()">測試獲取地區列表</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 選手相關 API -->
+        <div class="api-section">
+            <h2>👤 選手相關 API</h2>
+            <div class="api-group">
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/players</span></h3>
+                    <p>獲取選手列表</p>
+                    <button class="test-btn" onclick="testGetPlayers()">測試獲取選手列表</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method post">POST</span><span class="endpoint">/api/players</span></h3>
+                    <p>創建新選手</p>
+                    <div class="input-group">
+                        <label>遊戲暱稱:</label>
+                        <input type="text" id="playerNickname" placeholder="遊戲暱稱">
+                    </div>
+                    <div class="input-group">
+                        <label>真實姓名:</label>
+                        <input type="text" id="playerRealName" placeholder="真實姓名">
+                    </div>
+                    <div class="input-group">
+                        <label>位置:</label>
+                        <select id="playerPosition" style="width: 100%; padding: 8px; border: 1px solid #555; border-radius: 4px; background: rgba(0,0,0,0.5); color: #fff;">
+                            <option value="top">Top</option>
+                            <option value="jungle">Jungle</option>
+                            <option value="mid">Mid</option>
+                            <option value="adc">ADC</option>
+                            <option value="support">Support</option>
+                        </select>
+                    </div>
+                    <button class="test-btn" onclick="testCreatePlayer()">測試創建選手</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/players/positions</span></h3>
+                    <p>獲取所有位置列表</p>
+                    <button class="test-btn" onclick="testGetPositions()">測試獲取位置列表</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 賽事相關 API -->
+        <div class="api-section">
+            <h2>⚔️ 賽事相關 API</h2>
+            <div class="api-group">
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/matches</span></h3>
+                    <p>獲取比賽列表</p>
+                    <button class="test-btn" onclick="testGetMatches()">測試獲取比賽列表</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/matches/upcoming</span></h3>
+                    <p>獲取即將到來的比賽</p>
+                    <button class="test-btn" onclick="testGetUpcomingMatches()">測試獲取即將到來的比賽</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/matches/recent</span></h3>
+                    <p>獲取最近的比賽</p>
+                    <button class="test-btn" onclick="testGetRecentMatches()">測試獲取最近的比賽</button>
+                </div>
+                
+                <div class="api-item">
+                    <h3><span class="method get">GET</span><span class="endpoint">/api/matches/tournaments</span></h3>
+                    <p>獲取所有賽事名稱</p>
+                    <button class="test-btn" onclick="testGetTournaments()">測試獲取賽事名稱</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 回應區域 -->
+        <div class="api-section">
+            <h2>📝 API 回應</h2>
+            <div class="response-area" id="responseArea">等待API回應...</div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        let authToken = null;
+        
+        // 檢查伺服器狀態
+        async function checkServerStatus() {
+            const statusIndicator = document.getElementById('serverStatus');
+            const statusText = document.getElementById('statusText');
+            
+            statusIndicator.className = 'status-indicator loading';
+            statusText.textContent = '檢查中...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    statusIndicator.className = 'status-indicator online';
+                    statusText.textContent = '線上';
+                    displayResponse('伺服器狀態檢查', await response.json());
+                } else {
+                    throw new Error('伺服器回應異常');
+                }
+            } catch (error) {
+                statusIndicator.className = 'status-indicator offline';
+                statusText.textContent = '離線';
+                displayResponse('伺服器狀態檢查', { error: error.message });
+            }
+        }
+        
+        // 顯示回應
+        function displayResponse(title, data) {
+            const responseArea = document.getElementById('responseArea');
+            responseArea.textContent = `=== ${title} ===\n${JSON.stringify(data, null, 2)}`;
+        }
+        
+        // 清除回應
+        function clearResponse() {
+            document.getElementById('responseArea').textContent = '等待API回應...';
+        }
+        
+        // 測試註冊
+        async function testRegister() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            if (!username || !email || !password) {
+                alert('請填寫所有必要欄位');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const data = await response.json();
+                displayResponse('註冊測試', data);
+                
+                if (data.success && data.access_token) {
+                    authToken = data.access_token;
+                }
+            } catch (error) {
+                displayResponse('註冊測試', { error: error.message });
+            }
+        }
+        
+        // 測試登入
+        async function testLogin() {
+            const username = document.getElementById('loginUsername').value || 'testuser';
+            const password = document.getElementById('loginPassword').value || 'testpass';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                displayResponse('登入測試', data);
+                
+                if (data.success && data.access_token) {
+                    authToken = data.access_token;
+                }
+            } catch (error) {
+                displayResponse('登入測試', { error: error.message });
+            }
+        }
+        
+        // 測試獲取使用者資訊
+        async function testGetMe() {
+            if (!authToken) {
+                alert('請先登入');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                displayResponse('獲取使用者資訊', data);
+            } catch (error) {
+                displayResponse('獲取使用者資訊', { error: error.message });
+            }
+        }
+        
+        // 測試獲取隊伍列表
+        async function testGetTeams() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/teams`);
+                const data = await response.json();
+                displayResponse('獲取隊伍列表', data);
+            } catch (error) {
+                displayResponse('獲取隊伍列表', { error: error.message });
+            }
+        }
+        
+        // 測試創建隊伍
+        async function testCreateTeam() {
+            if (!authToken) {
+                alert('請先登入');
+                return;
+            }
+            
+            const name = document.getElementById('teamName').value;
+            const region = document.getElementById('teamRegion').value;
+            const founded_year = parseInt(document.getElementById('teamYear').value);
+            
+            if (!name || !region || !founded_year) {
+                alert('請填寫所有必要欄位');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/teams`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ name, region, founded_year })
+                });
+                
+                const data = await response.json();
+                displayResponse('創建隊伍', data);
+            } catch (error) {
+                displayResponse('創建隊伍', { error: error.message });
+            }
+        }
+        
+        // 測試獲取地區列表
+        async function testGetRegions() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/teams/regions`);
+                const data = await response.json();
+                displayResponse('獲取地區列表', data);
+            } catch (error) {
+                displayResponse('獲取地區列表', { error: error.message });
+            }
+        }
+        
+        // 測試獲取選手列表
+        async function testGetPlayers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/players`);
+                const data = await response.json();
+                displayResponse('獲取選手列表', data);
+            } catch (error) {
+                displayResponse('獲取選手列表', { error: error.message });
+            }
+        }
+        
+        // 測試創建選手
+        async function testCreatePlayer() {
+            if (!authToken) {
+                alert('請先登入');
+                return;
+            }
+            
+            const nickname = document.getElementById('playerNickname').value;
+            const real_name = document.getElementById('playerRealName').value;
+            const position = document.getElementById('playerPosition').value;
+            
+            if (!nickname || !real_name || !position) {
+                alert('請填寫所有必要欄位');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/players`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ nickname, real_name, position })
+                });
+                
+                const data = await response.json();
+                displayResponse('創建選手', data);
+            } catch (error) {
+                displayResponse('創建選手', { error: error.message });
+            }
+        }
+        
+        // 測試獲取位置列表
+        async function testGetPositions() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/players/positions`);
+                const data = await response.json();
+                displayResponse('獲取位置列表', data);
+            } catch (error) {
+                displayResponse('獲取位置列表', { error: error.message });
+            }
+        }
+        
+        // 測試獲取比賽列表
+        async function testGetMatches() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/matches`);
+                const data = await response.json();
+                displayResponse('獲取比賽列表', data);
+            } catch (error) {
+                displayResponse('獲取比賽列表', { error: error.message });
+            }
+        }
+        
+        // 測試獲取即將到來的比賽
+        async function testGetUpcomingMatches() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/matches/upcoming`);
+                const data = await response.json();
+                displayResponse('獲取即將到來的比賽', data);
+            } catch (error) {
+                displayResponse('獲取即將到來的比賽', { error: error.message });
+            }
+        }
+        
+        // 測試獲取最近的比賽
+        async function testGetRecentMatches() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/matches/recent`);
+                const data = await response.json();
+                displayResponse('獲取最近的比賽', data);
+            } catch (error) {
+                displayResponse('獲取最近的比賽', { error: error.message });
+            }
+        }
+        
+        // 測試獲取賽事名稱
+        async function testGetTournaments() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/matches/tournaments`);
+                const data = await response.json();
+                displayResponse('獲取賽事名稱', data);
+            } catch (error) {
+                displayResponse('獲取賽事名稱', { error: error.message });
+            }
+        }
+        
+        // 載入範例資料
+        async function loadSampleData() {
+            alert('範例資料載入功能開發中...');
+        }
+        
+        // 頁面載入時檢查伺服器狀態
+        window.addEventListener('load', checkServerStatus);
+    </script>
+</body>
+</html>

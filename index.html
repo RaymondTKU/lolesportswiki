@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英雄聯盟電競資訊網</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="images/logo.png" alt="Logo" class="logo-img">
+                <span class="logo-text">LoL eSports</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">首頁</a></li>
+                <li><a href="pages/matches.html">賽事</a></li>
+                <li><a href="pages/teams.html">隊伍</a></li>
+                <li><a href="pages/players.html">選手</a></li>
+                <li><a href="pages/favorites.html">收藏</a></li>
+            </ul>
+            <div class="nav-auth">
+                <button class="btn btn-login" onclick="window.location.href='pages/login.html'">登入</button>
+                <button class="btn btn-register" onclick="window.location.href='pages/register.html'">註冊</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄橫幅區 -->
+    <section class="hero-banner" id="home">
+        <div class="hero-background">
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">英雄聯盟電競資訊網</h1>
+            <p class="hero-subtitle">掌握最新賽事資訊，追蹤喜愛的選手與隊伍</p>
+            <div class="hero-search">
+                <input type="text" placeholder="搜尋隊伍、選手或賽事..." class="search-input">
+                <button class="search-btn">搜尋</button>
+            </div>
+        </div>
+        <div class="hero-scroll-indicator">
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- 最新賽事預告區 -->
+    <section class="upcoming-matches">
+        <div class="container">
+            <h2 class="section-title">最新賽事預告</h2>
+            <div class="matches-grid">
+                <div class="match-card">
+                    <div class="match-time">2024-07-20 19:00</div>
+                    <div class="match-teams">
+                        <div class="team team-a">
+                            <img src="images/team-a.png" alt="Team A">
+                            <span>T1</span>
+                        </div>
+                        <div class="match-vs">VS</div>
+                        <div class="team team-b">
+                            <img src="images/team-b.png" alt="Team B">
+                            <span>GEN</span>
+                        </div>
+                    </div>
+                    <div class="match-tournament">LCK Summer 2024</div>
+                    <button class="btn btn-watch">觀看預告</button>
+                </div>
+                
+                <div class="match-card">
+                    <div class="match-time">2024-07-21 17:00</div>
+                    <div class="match-teams">
+                        <div class="team team-a">
+                            <img src="images/team-c.png" alt="Team C">
+                            <span>JDG</span>
+                        </div>
+                        <div class="match-vs">VS</div>
+                        <div class="team team-b">
+                            <img src="images/team-d.png" alt="Team D">
+                            <span>BLG</span>
+                        </div>
+                    </div>
+                    <div class="match-tournament">LPL Summer 2024</div>
+                    <button class="btn btn-watch">觀看預告</button>
+                </div>
+                
+                <div class="match-card">
+                    <div class="match-time">2024-07-22 20:00</div>
+                    <div class="match-teams">
+                        <div class="team team-a">
+                            <img src="images/team-e.png" alt="Team E">
+                            <span>G2</span>
+                        </div>
+                        <div class="match-vs">VS</div>
+                        <div class="team team-b">
+                            <img src="images/team-f.png" alt="Team F">
+                            <span>FNC</span>
+                        </div>
+                    </div>
+                    <div class="match-tournament">LEC Summer 2024</div>
+                    <button class="btn btn-watch">觀看預告</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 熱門隊伍展示區 -->
+    <section class="popular-teams">
+        <div class="container">
+            <h2 class="section-title">熱門隊伍</h2>
+            <div class="teams-carousel">
+                <div class="carousel-container">
+                    <div class="team-showcase">
+                        <img src="images/team-showcase-1.jpg" alt="T1">
+                        <div class="team-info">
+                            <h3>T1</h3>
+                            <p>韓國頂尖戰隊</p>
+                        </div>
+                    </div>
+                    <div class="team-showcase">
+                        <img src="images/team-showcase-2.jpg" alt="JDG">
+                        <div class="team-info">
+                            <h3>JDG</h3>
+                            <p>中國電競強隊</p>
+                        </div>
+                    </div>
+                    <div class="team-showcase">
+                        <img src="images/team-showcase-3.jpg" alt="G2">
+                        <div class="team-info">
+                            <h3>G2</h3>
+                            <p>歐洲電競霸主</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 明星選手區 -->
+    <section class="star-players">
+        <div class="container">
+            <h2 class="section-title">明星選手</h2>
+            <div class="players-grid">
+                <div class="player-card">
+                    <div class="player-avatar">
+                        <img src="images/player-1.jpg" alt="Faker">
+                    </div>
+                    <div class="player-info">
+                        <h3>Faker</h3>
+                        <p>T1 中路</p>
+                        <div class="player-stats">
+                            <span>KDA: 3.2</span>
+                            <span>勝率: 78%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="player-card">
+                    <div class="player-avatar">
+                        <img src="images/player-2.jpg" alt="Ruler">
+                    </div>
+                    <div class="player-info">
+                        <h3>Ruler</h3>
+                        <p>JDG ADC</p>
+                        <div class="player-stats">
+                            <span>KDA: 2.8</span>
+                            <span>勝率: 74%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="player-card">
+                    <div class="player-avatar">
+                        <img src="images/player-3.jpg" alt="Caps">
+                    </div>
+                    <div class="player-info">
+                        <h3>Caps</h3>
+                        <p>G2 中路</p>
+                        <div class="player-stats">
+                            <span>KDA: 3.1</span>
+                            <span>勝率: 72%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="player-card">
+                    <div class="player-avatar">
+                        <img src="images/player-4.jpg" alt="Canyon">
+                    </div>
+                    <div class="player-info">
+                        <h3>Canyon</h3>
+                        <p>DRX 打野</p>
+                        <div class="player-stats">
+                            <span>KDA: 2.9</span>
+                            <span>勝率: 71%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>網站連結</h4>
+                    <ul>
+                        <li><a href="#">關於我們</a></li>
+                        <li><a href="#">服務條款</a></li>
+                        <li><a href="#">隱私政策</a></li>
+                        <li><a href="#">聯絡我們</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>快速連結</h4>
+                    <ul>
+                        <li><a href="#">賽事日程</a></li>
+                        <li><a href="#">隊伍排名</a></li>
+                        <li><a href="#">選手統計</a></li>
+                        <li><a href="#">新聞資訊</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>社群媒體</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Facebook</a>
+                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">Instagram</a>
+                        <a href="#" class="social-link">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 英雄聯盟電競資訊網. 版權所有.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

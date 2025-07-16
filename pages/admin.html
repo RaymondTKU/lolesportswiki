@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理員後台 - 英雄聯盟電競資訊網</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <style>
+        .admin-container {
+            min-height: 100vh;
+            background: var(--gradient-primary);
+            padding: 2rem;
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .admin-title {
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+        }
+        
+        .admin-subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        
+        .admin-nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(200, 155, 60, 0.3);
+            border-radius: 10px;
+            color: var(--text-white);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-tab:hover,
+        .nav-tab.active {
+            background: var(--accent-gold);
+            color: var(--primary-blue);
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+        }
+        
+        .admin-panel {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(200, 155, 60, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-panel.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(200, 155, 60, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-gold);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(200, 155, 60, 0.3);
+        }
+        
+        .data-table th {
+            background: rgba(200, 155, 60, 0.2);
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+        
+        .data-table td {
+            color: var(--text-white);
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit {
+            background: var(--accent-gold);
+            color: var(--primary-blue);
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #d4af37;
+        }
+        
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(200, 155, 60, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .page-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(200, 155, 60, 0.3);
+            border-radius: 5px;
+            color: var(--text-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover,
+        .page-btn.active {
+            background: var(--accent-gold);
+            color: var(--primary-blue);
+        }
+        
+        .upload-area {
+            border: 2px dashed rgba(200, 155, 60, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--accent-gold);
+            background: rgba(200, 155, 60, 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        .success {
+            background: rgba(39, 174, 96, 0.2);
+            border: 1px solid #27ae60;
+            color: #27ae60;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                font-size: 0.9rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1 class="admin-title">管理員後台</h1>
+            <p class="admin-subtitle">英雄聯盟電競資訊網管理系統</p>
+        </div>
+        
+        <nav class="admin-nav">
+            <div class="nav-tab active" data-tab="dashboard">控制台</div>
+            <div class="nav-tab" data-tab="users">用戶管理</div>
+            <div class="nav-tab" data-tab="matches">比賽管理</div>
+            <div class="nav-tab" data-tab="comments">評論管理</div>
+            <div class="nav-tab" data-tab="upload">圖片上傳</div>
+        </nav>
+        
+        <!-- 控制台面板 -->
+        <div class="admin-panel active" id="dashboard">
+            <h2 style="color: var(--accent-gold); margin-bottom: 1rem;">系統統計</h2>
+            <div class="stats-grid" id="statsGrid">
+                <div class="loading">載入中...</div>
+            </div>
+            
+            <h3 style="color: var(--accent-gold); margin-top: 2rem; margin-bottom: 1rem;">最近活動</h3>
+            <div id="recentActivities">
+                <div class="loading">載入中...</div>
+            </div>
+        </div>
+        
+        <!-- 用戶管理面板 -->
+        <div class="admin-panel" id="users">
+            <h2 style="color: var(--accent-gold); margin-bottom: 1rem;">用戶管理</h2>
+            <input type="text" class="search-box" id="userSearch" placeholder="搜索用戶...">
+            <div id="usersList">
+                <div class="loading">載入中...</div>
+            </div>
+            <div class="pagination" id="usersPagination"></div>
+        </div>
+        
+        <!-- 比賽管理面板 -->
+        <div class="admin-panel" id="matches">
+            <h2 style="color: var(--accent-gold); margin-bottom: 1rem;">比賽管理</h2>
+            <input type="text" class="search-box" id="matchSearch" placeholder="搜索比賽...">
+            <div id="matchesList">
+                <div class="loading">載入中...</div>
+            </div>
+            <div class="pagination" id="matchesPagination"></div>
+        </div>
+        
+        <!-- 評論管理面板 -->
+        <div class="admin-panel" id="comments">
+            <h2 style="color: var(--accent-gold); margin-bottom: 1rem;">評論管理</h2>
+            <div id="commentsList">
+                <div class="loading">載入中...</div>
+            </div>
+            <div class="pagination" id="commentsPagination"></div>
+        </div>
+        
+        <!-- 圖片上傳面板 -->
+        <div class="admin-panel" id="upload">
+            <h2 style="color: var(--accent-gold); margin-bottom: 1rem;">圖片上傳</h2>
+            
+            <div style="margin-bottom: 2rem;">
+                <h3 style="color: var(--text-white); margin-bottom: 1rem;">隊伍Logo</h3>
+                <div class="upload-area" id="teamLogoUpload">
+                    <div class="upload-icon">📁</div>
+                    <p>點擊或拖拽上傳隊伍Logo</p>
+                    <p style="font-size: 0.9rem; color: var(--text-light);">支援 PNG, JPG, GIF 格式，最大 5MB</p>
+                </div>
+                <input type="file" id="teamLogoFile" accept="image/*" style="display: none;">
+            </div>
+            
+            <div style="margin-bottom: 2rem;">
+                <h3 style="color: var(--text-white); margin-bottom: 1rem;">選手頭像</h3>
+                <div class="upload-area" id="playerAvatarUpload">
+                    <div class="upload-icon">📁</div>
+                    <p>點擊或拖拽上傳選手頭像</p>
+                    <p style="font-size: 0.9rem; color: var(--text-light);">支援 PNG, JPG, GIF 格式，最大 5MB</p>
+                </div>
+                <input type="file" id="playerAvatarFile" accept="image/*" style="display: none;">
+            </div>
+            
+            <div id="uploadResults"></div>
+        </div>
+    </div>
+    
+    <script src="../js/main.js"></script>
+    <script>
+        // 全局變量
+        let currentTab = 'dashboard';
+        let currentPage = {
+            users: 1,
+            matches: 1,
+            comments: 1
+        };
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            initTabs();
+            initUpload();
+            loadDashboard();
+        });
+        
+        // 檢查登入狀態
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // 驗證是否為管理員
+            fetch('/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.user.role !== 'admin') {
+                    alert('需要管理員權限');
+                    window.location.href = '../index.html';
+                }
+            })
+            .catch(error => {
+                console.error('驗證失敗:', error);
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            });
+        }
+        
+        // 初始化標籤頁
+        function initTabs() {
+            const tabs = document.querySelectorAll('.nav-tab');
+            const panels = document.querySelectorAll('.admin-panel');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    
+                    // 切換標籤
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 切換面板
+                    panels.forEach(p => p.classList.remove('active'));
+                    document.getElementById(tabName).classList.add('active');
+                    
+                    currentTab = tabName;
+                    
+                    // 載入對應資料
+                    switch(tabName) {
+                        case 'dashboard':
+                            loadDashboard();
+                            break;
+                        case 'users':
+                            loadUsers();
+                            break;
+                        case 'matches':
+                            loadMatches();
+                            break;
+                        case 'comments':
+                            loadComments();
+                            break;
+                    }
+                });
+            });
+        }
+        
+        // 載入控制台資料
+        function loadDashboard() {
+            const token = localStorage.getItem('token');
+            
+            fetch('/api/admin/dashboard', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayStats(data.stats);
+                displayRecentActivities(data.recent_activities);
+            })
+            .catch(error => {
+                console.error('載入控制台資料失敗:', error);
+                showError('載入控制台資料失敗');
+            });
+        }
+        
+        // 顯示統計資料
+        function displayStats(stats) {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.users}</div>
+                    <div class="stat-label">用戶數量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.teams}</div>
+                    <div class="stat-label">隊伍數量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.players}</div>
+                    <div class="stat-label">選手數量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.matches}</div>
+                    <div class="stat-label">比賽數量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.comments}</div>
+                    <div class="stat-label">評論數量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.favorites}</div>
+                    <div class="stat-label">收藏數量</div>
+                </div>
+            `;
+        }
+        
+        // 顯示最近活動
+        function displayRecentActivities(activities) {
+            const container = document.getElementById('recentActivities');
+            
+            if (activities.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light);">暫無活動記錄</p>';
+                return;
+            }
+            
+            const html = activities.map(activity => `
+                <div style="padding: 1rem; border-bottom: 1px solid rgba(200, 155, 60, 0.3);">
+                    <div style="color: var(--text-white);">${activity.description}</div>
+                    <div style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.5rem;">
+                        ${new Date(activity.timestamp).toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        // 載入用戶列表
+        function loadUsers(page = 1, search = '') {
+            const token = localStorage.getItem('token');
+            
+            fetch(`/api/admin/users?page=${page}&search=${search}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayUsers(data.users);
+                displayPagination('users', data.page, data.total_pages);
+            })
+            .catch(error => {
+                console.error('載入用戶列表失敗:', error);
+                showError('載入用戶列表失敗');
+            });
+        }
+        
+        // 顯示用戶列表
+        function displayUsers(users) {
+            const container = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light);">找不到用戶</p>';
+                return;
+            }
+            
+            const html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>用戶名</th>
+                            <th>電子郵件</th>
+                            <th>角色</th>
+                            <th>註冊時間</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => `
+                            <tr>
+                                <td>${user.username}</td>
+                                <td>${user.email}</td>
+                                <td>${user.role === 'admin' ? '管理員' : '用戶'}</td>
+                                <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
+                                <td>
+                                    <button class="action-btn btn-edit" onclick="editUser('${user._id}')">編輯</button>
+                                    ${user.role !== 'admin' ? `<button class="action-btn btn-delete" onclick="deleteUser('${user._id}')">刪除</button>` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // 載入比賽列表
+        function loadMatches(page = 1, search = '') {
+            const token = localStorage.getItem('token');
+            
+            fetch(`/api/admin/matches?page=${page}&search=${search}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayMatches(data.matches);
+                displayPagination('matches', data.page, data.total_pages);
+            })
+            .catch(error => {
+                console.error('載入比賽列表失敗:', error);
+                showError('載入比賽列表失敗');
+            });
+        }
+        
+        // 顯示比賽列表
+        function displayMatches(matches) {
+            const container = document.getElementById('matchesList');
+            
+            if (matches.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light);">找不到比賽</p>';
+                return;
+            }
+            
+            const html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>隊伍A</th>
+                            <th>隊伍B</th>
+                            <th>比賽時間</th>
+                            <th>狀態</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${matches.map(match => `
+                            <tr>
+                                <td>${match.team_a}</td>
+                                <td>${match.team_b}</td>
+                                <td>${new Date(match.date).toLocaleDateString()}</td>
+                                <td>${match.status || '未開始'}</td>
+                                <td>
+                                    <button class="action-btn btn-delete" onclick="deleteMatch('${match._id}')">刪除</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // 載入評論列表
+        function loadComments(page = 1) {
+            const token = localStorage.getItem('token');
+            
+            fetch(`/api/admin/comments?page=${page}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayComments(data.comments);
+                displayPagination('comments', data.page, data.total_pages);
+            })
+            .catch(error => {
+                console.error('載入評論列表失敗:', error);
+                showError('載入評論列表失敗');
+            });
+        }
+        
+        // 顯示評論列表
+        function displayComments(comments) {
+            const container = document.getElementById('commentsList');
+            
+            if (comments.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light);">找不到評論</p>';
+                return;
+            }
+            
+            const html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>用戶</th>
+                            <th>內容</th>
+                            <th>比賽</th>
+                            <th>發表時間</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${comments.map(comment => `
+                            <tr>
+                                <td>${comment.user ? comment.user.username : 'N/A'}</td>
+                                <td>${comment.content.substring(0, 100)}${comment.content.length > 100 ? '...' : ''}</td>
+                                <td>${comment.match ? `${comment.match.team_a} vs ${comment.match.team_b}` : 'N/A'}</td>
+                                <td>${new Date(comment.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="action-btn btn-delete" onclick="deleteComment('${comment._id}')">刪除</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // 顯示分頁
+        function displayPagination(type, currentPage, totalPages) {
+            const container = document.getElementById(`${type}Pagination`);
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            // 上一頁
+            if (currentPage > 1) {
+                html += `<button class="page-btn" onclick="changePage('${type}', ${currentPage - 1})">上一頁</button>`;
+            }
+            
+            // 頁碼
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage('${type}', ${i})">${i}</button>`;
+            }
+            
+            // 下一頁
+            if (currentPage < totalPages) {
+                html += `<button class="page-btn" onclick="changePage('${type}', ${currentPage + 1})">下一頁</button>`;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // 換頁
+        function changePage(type, page) {
+            currentPage[type] = page;
+            
+            switch(type) {
+                case 'users':
+                    loadUsers(page, document.getElementById('userSearch').value);
+                    break;
+                case 'matches':
+                    loadMatches(page, document.getElementById('matchSearch').value);
+                    break;
+                case 'comments':
+                    loadComments(page);
+                    break;
+            }
+        }
+        
+        // 刪除用戶
+        function deleteUser(userId) {
+            if (!confirm('確定要刪除此用戶嗎？')) return;
+            
+            const token = localStorage.getItem('token');
+            
+            fetch(`/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    showSuccess(data.message);
+                    loadUsers(currentPage.users);
+                }
+            })
+            .catch(error => {
+                console.error('刪除用戶失敗:', error);
+                showError('刪除用戶失敗');
+            });
+        }
+        
+        // 刪除比賽
+        function deleteMatch(matchId) {
+            if (!confirm('確定要刪除此比賽嗎？')) return;
+            
+            const token = localStorage.getItem('token');
+            
+            fetch(`/api/admin/matches/${matchId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    showSuccess(data.message);
+                    loadMatches(currentPage.matches);
+                }
+            })
+            .catch(error => {
+                console.error('刪除比賽失敗:', error);
+                showError('刪除比賽失敗');
+            });
+        }
+        
+        // 刪除評論
+        function deleteComment(commentId) {
+            if (!confirm('確定要刪除此評論嗎？')) return;
+            
+            const token = localStorage.getItem('token');
+            
+            fetch(`/api/admin/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    showSuccess(data.message);
+                    loadComments(currentPage.comments);
+                }
+            })
+            .catch(error => {
+                console.error('刪除評論失敗:', error);
+                showError('刪除評論失敗');
+            });
+        }
+        
+        // 初始化上傳功能
+        function initUpload() {
+            // 隊伍Logo上傳
+            const teamLogoUpload = document.getElementById('teamLogoUpload');
+            const teamLogoFile = document.getElementById('teamLogoFile');
+            
+            teamLogoUpload.addEventListener('click', () => teamLogoFile.click());
+            teamLogoFile.addEventListener('change', (e) => uploadFile(e.target.files[0], 'team-logo'));
+            
+            // 選手頭像上傳
+            const playerAvatarUpload = document.getElementById('playerAvatarUpload');
+            const playerAvatarFile = document.getElementById('playerAvatarFile');
+            
+            playerAvatarUpload.addEventListener('click', () => playerAvatarFile.click());
+            playerAvatarFile.addEventListener('change', (e) => uploadFile(e.target.files[0], 'player-avatar'));
+            
+            // 拖拽上傳
+            [teamLogoUpload, playerAvatarUpload].forEach(element => {
+                element.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    element.style.borderColor = 'var(--accent-gold)';
+                });
+                
+                element.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    element.style.borderColor = 'rgba(200, 155, 60, 0.5)';
+                });
+                
+                element.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    element.style.borderColor = 'rgba(200, 155, 60, 0.5)';
+                    
+                    const file = e.dataTransfer.files[0];
+                    const type = element.id === 'teamLogoUpload' ? 'team-logo' : 'player-avatar';
+                    uploadFile(file, type);
+                });
+            });
+        }
+        
+        // 上傳檔案
+        function uploadFile(file, type) {
+            if (!file) return;
+            
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // 顯示載入中
+            const resultsContainer = document.getElementById('uploadResults');
+            resultsContainer.innerHTML = '<div class="loading">上傳中...</div>';
+            
+            fetch(`/api/upload/${type}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    showSuccess(data.message);
+                    resultsContainer.innerHTML = `
+                        <div class="success">
+                            <p>${data.message}</p>
+                            <p>檔案URL: <a href="${data.file_url}" target="_blank" style="color: var(--accent-gold);">${data.file_url}</a></p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('上傳失敗:', error);
+                showError('上傳失敗');
+                resultsContainer.innerHTML = '';
+            });
+        }
+        
+        // 顯示成功訊息
+        function showSuccess(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'success';
+            alertDiv.textContent = message;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(alertDiv);
+            }, 3000);
+        }
+        
+        // 顯示錯誤訊息
+        function showError(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'error';
+            alertDiv.textContent = message;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(alertDiv);
+            }, 3000);
+        }
+        
+        // 搜索事件監聽
+        document.getElementById('userSearch').addEventListener('input', function() {
+            const searchTerm = this.value;
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                loadUsers(1, searchTerm);
+            }, 500);
+        });
+        
+        document.getElementById('matchSearch').addEventListener('input', function() {
+            const searchTerm = this.value;
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                loadMatches(1, searchTerm);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

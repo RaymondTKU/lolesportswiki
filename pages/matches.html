@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>賽事列表 - 英雄聯盟電競資訊網</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        /* 賽事列表專用樣式 */
+        .matches-container {
+            max-width: 1200px;
+            margin:             <ul class="nav-menu">
+                <li><a href="../index.html">首頁</a></li>
+            <ul class="nav-menu">
+                <li><a href="../index.html">首頁</a></li>
+                <li><a href="matches.html" class="active">賽事</a></li>
+                <li><a href="teams.html">隊伍</a></li>
+                <li><a href="players.html">選手</a></li>
+                <li><a href="favorites.html">收藏</a></li>
+            </ul>
+            <div class="nav-auth">
+                <a href="login.html" class="login-btn">登入</a>
+                <a href="register.html" class="register-btn">註冊</a>
+            </div>
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 3rem;
+            color: var(--gold-color);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .page-header p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .filters-section {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .filters-title {
+            color: var(--gold-color);
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            color: var(--text-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--gold-color);
+            box-shadow: 0 0 0 3px rgba(200,155,60,0.2);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .filter-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .filter-btn.primary {
+            background: linear-gradient(45deg, var(--gold-color), #f0e6d2);
+            color: var(--bg-color);
+        }
+        
+        .filter-btn.secondary {
+            background: transparent;
+            color: var(--gold-color);
+            border: 2px solid var(--gold-color);
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .matches-grid {
+            display: grid;
+            gap: 25px;
+        }
+        
+        .match-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+            border-color: var(--gold-color);
+        }
+        
+        .match-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .match-tournament {
+            color: var(--gold-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .match-date {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9rem;
+        }
+        
+        .match-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+        
+        .match-status.scheduled {
+            background: rgba(255,193,7,0.2);
+            color: #ffc107;
+        }
+        
+        .match-status.live {
+            background: rgba(220,53,69,0.2);
+            color: #dc3545;
+            animation: pulse 2s infinite;
+        }
+        
+        .match-status.finished {
+            background: rgba(40,167,69,0.2);
+            color: #28a745;
+        }
+        
+        .match-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+            min-height: 120px;
+        }
+        
+        .team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .team-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            border: 3px solid var(--gold-color);
+            object-fit: cover;
+        }
+        
+        .team-name {
+            color: var(--text-color);
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .team-score {
+            color: var(--gold-color);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+        
+        .match-vs {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 20px;
+        }
+        
+        .vs-text {
+            color: var(--gold-color);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .match-format {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .match-info {
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .match-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .match-venue {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .match-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .match-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .match-btn.primary {
+            background: var(--gold-color);
+            color: var(--bg-color);
+        }
+        
+        .match-btn.secondary {
+            background: transparent;
+            color: var(--gold-color);
+            border: 1px solid var(--gold-color);
+        }
+        
+        .match-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+            gap: 10px;
+        }
+        
+        .pagination-btn {
+            padding: 10px 16px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .pagination-btn:hover,
+        .pagination-btn.active {
+            background: var(--gold-color);
+            color: var(--bg-color);
+            border-color: var(--gold-color);
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--gold-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state h3 {
+            color: var(--gold-color);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .countdown {
+            color: var(--gold-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .matches-container {
+                padding: 15px;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+            }
+            
+            .match-teams {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .match-vs {
+                margin: 10px 0;
+            }
+            
+            .match-details {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .match-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <h2>LoL Esports</h2>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">首頁</a></li>
+                <li><a href="pages/matches.html" class="active">賽事</a></li>
+                <li><a href="pages/teams.html">隊伍</a></li>
+                <li><a href="pages/players.html">選手</a></li>
+                <li><a href="#news">新聞</a></li>
+            </ul>
+            <div class="nav-auth">
+                <a href="pages/login.html" class="login-btn">登入</a>
+                <a href="pages/register.html" class="register-btn">註冊</a>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 頁面標題 -->
+    <section class="page-header">
+        <h1>⚔️ 賽事列表</h1>
+        <p>追蹤最新的英雄聯盟職業賽事，不錯過任何精彩對決</p>
+    </section>
+
+    <div class="matches-container">
+        <!-- 篩選器 -->
+        <div class="filters-section">
+            <h2 class="filters-title">🔍 篩選賽事</h2>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="tournamentFilter">賽事名稱</label>
+                    <select id="tournamentFilter">
+                        <option value="">所有賽事</option>
+                        <option value="LCK">LCK</option>
+                        <option value="LPL">LPL</option>
+                        <option value="LEC">LEC</option>
+                        <option value="LCS">LCS</option>
+                        <option value="PCS">PCS</option>
+                        <option value="Worlds">世界大賽</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="statusFilter">比賽狀態</label>
+                    <select id="statusFilter">
+                        <option value="">所有狀態</option>
+                        <option value="scheduled">即將開始</option>
+                        <option value="live">進行中</option>
+                        <option value="finished">已結束</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="seasonFilter">賽季</label>
+                    <select id="seasonFilter">
+                        <option value="">所有賽季</option>
+                        <option value="2024 Spring">2024 春季</option>
+                        <option value="2024 Summer">2024 夏季</option>
+                        <option value="2024 Worlds">2024 世界大賽</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="dateFilter">日期範圍</label>
+                    <input type="date" id="dateFilter">
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="filter-btn primary" onclick="applyFilters()">
+                    🔍 套用篩選
+                </button>
+                <button class="filter-btn secondary" onclick="clearFilters()">
+                    🗑️ 清除篩選
+                </button>
+            </div>
+        </div>
+
+        <!-- 載入中狀態 -->
+        <div class="loading" id="loadingState" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>載入賽事資料中...</p>
+        </div>
+
+        <!-- 賽事列表 -->
+        <div class="matches-grid" id="matchesGrid">
+            <!-- 賽事卡片會透過JavaScript動態載入 -->
+        </div>
+
+        <!-- 空狀態 -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <h3>🎮 沒有找到相符的賽事</h3>
+            <p>嘗試調整篩選條件或檢查網路連接</p>
+        </div>
+
+        <!-- 分頁 -->
+        <div class="pagination" id="pagination" style="display: none;">
+            <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">
+                ← 上一頁
+            </button>
+            <span id="pageInfo">第 1 頁 / 共 1 頁</span>
+            <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">
+                下一頁 →
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 全域變數
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFilters = {};
+        const API_BASE_URL = 'http://localhost:5000';
+        
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMatches();
+            loadTournaments();
+            loadSeasons();
+            
+            // 監聽篩選器變化
+            document.getElementById('tournamentFilter').addEventListener('change', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+            document.getElementById('seasonFilter').addEventListener('change', applyFilters);
+            document.getElementById('dateFilter').addEventListener('change', applyFilters);
+        });
+        
+        // 載入賽事列表
+        async function loadMatches(page = 1) {
+            showLoading(true);
+            hideEmptyState();
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: 10,
+                    ...currentFilters
+                });
+                
+                const response = await fetch(`${API_BASE_URL}/api/matches?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayMatches(data.data);
+                    updatePagination(data.pagination);
+                    currentPage = page;
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('載入賽事失敗:', error);
+                showEmptyState();
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // 顯示賽事列表
+        function displayMatches(matches) {
+            const matchesGrid = document.getElementById('matchesGrid');
+            
+            if (matches.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            matchesGrid.innerHTML = matches.map(match => `
+                <div class="match-card">
+                    <div class="match-header">
+                        <div class="match-tournament">${match.tournament}</div>
+                        <div class="match-date">${formatDate(match.date)}</div>
+                        <div class="match-status ${match.status}">${getStatusText(match.status)}</div>
+                    </div>
+                    
+                    <div class="match-teams">
+                        <div class="team">
+                            <img src="${match.team_a?.logo || '/images/default-team.png'}" 
+                                 alt="${match.team_a?.name || 'Team A'}" 
+                                 class="team-logo">
+                            <div class="team-name">${match.team_a?.name || 'TBD'}</div>
+                            ${match.status === 'finished' ? `<div class="team-score">${match.team_a_score}</div>` : ''}
+                        </div>
+                        
+                        <div class="match-vs">
+                            <div class="vs-text">VS</div>
+                            <div class="match-format">${match.match_format}</div>
+                        </div>
+                        
+                        <div class="team">
+                            <img src="${match.team_b?.logo || '/images/default-team.png'}" 
+                                 alt="${match.team_b?.name || 'Team B'}" 
+                                 class="team-logo">
+                            <div class="team-name">${match.team_b?.name || 'TBD'}</div>
+                            ${match.status === 'finished' ? `<div class="team-score">${match.team_b_score}</div>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="match-info">
+                        <div class="match-details">
+                            <div class="match-venue">
+                                📍 ${match.venue || '線上賽事'}
+                            </div>
+                            
+                            <div class="match-actions">
+                                <a href="match-detail.html?id=${match.id}" class="match-btn primary">
+                                    📊 詳細資料
+                                </a>
+                                ${match.stream_url ? `<a href="${match.stream_url}" target="_blank" class="match-btn secondary">🎥 觀看直播</a>` : ''}
+                                ${match.vod_url ? `<a href="${match.vod_url}" target="_blank" class="match-btn secondary">📺 觀看回放</a>` : ''}
+                            </div>
+                        </div>
+                        
+                        ${match.status === 'scheduled' ? `
+                            <div class="countdown" id="countdown-${match.id}">
+                                倒數計時: <span data-date="${match.date}">計算中...</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            // 啟動倒數計時
+            startCountdowns();
+        }
+        
+        // 更新分頁
+        function updatePagination(pagination) {
+            const paginationDiv = document.getElementById('pagination');
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (pagination.pages > 1) {
+                paginationDiv.style.display = 'flex';
+                pageInfo.textContent = `第 ${pagination.page} 頁 / 共 ${pagination.pages} 頁`;
+                
+                prevBtn.disabled = pagination.page <= 1;
+                nextBtn.disabled = pagination.page >= pagination.pages;
+                
+                totalPages = pagination.pages;
+            } else {
+                paginationDiv.style.display = 'none';
+            }
+        }
+        
+        // 套用篩選器
+        function applyFilters() {
+            const tournament = document.getElementById('tournamentFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const season = document.getElementById('seasonFilter').value;
+            const date = document.getElementById('dateFilter').value;
+            
+            currentFilters = {};
+            
+            if (tournament) currentFilters.tournament = tournament;
+            if (status) currentFilters.status = status;
+            if (season) currentFilters.season = season;
+            if (date) currentFilters.start_date = date;
+            
+            currentPage = 1;
+            loadMatches(1);
+        }
+        
+        // 清除篩選器
+        function clearFilters() {
+            document.getElementById('tournamentFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('seasonFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            
+            currentFilters = {};
+            currentPage = 1;
+            loadMatches(1);
+        }
+        
+        // 換頁
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                loadMatches(newPage);
+            }
+        }
+        
+        // 載入賽事名稱選項
+        async function loadTournaments() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/matches/tournaments`);
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    const select = document.getElementById('tournamentFilter');
+                    const currentValue = select.value;
+                    
+                    // 清除現有選項（保留第一個"所有賽事"）
+                    select.innerHTML = '<option value="">所有賽事</option>';
+                    
+                    // 添加新選項
+                    data.data.forEach(tournament => {
+                        const option = document.createElement('option');
+                        option.value = tournament;
+                        option.textContent = tournament;
+                        select.appendChild(option);
+                    });
+                    
+                    // 恢復選中值
+                    select.value = currentValue;
+                }
+            } catch (error) {
+                console.error('載入賽事名稱失敗:', error);
+            }
+        }
+        
+        // 載入賽季選項
+        async function loadSeasons() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/matches/seasons`);
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    const select = document.getElementById('seasonFilter');
+                    const currentValue = select.value;
+                    
+                    // 清除現有選項（保留第一個"所有賽季"）
+                    select.innerHTML = '<option value="">所有賽季</option>';
+                    
+                    // 添加新選項
+                    data.data.forEach(season => {
+                        const option = document.createElement('option');
+                        option.value = season;
+                        option.textContent = season;
+                        select.appendChild(option);
+                    });
+                    
+                    // 恢復選中值
+                    select.value = currentValue;
+                }
+            } catch (error) {
+                console.error('載入賽季失敗:', error);
+            }
+        }
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // 取得狀態文字
+        function getStatusText(status) {
+            const statusMap = {
+                'scheduled': '即將開始',
+                'live': '進行中',
+                'finished': '已結束',
+                'cancelled': '已取消'
+            };
+            return statusMap[status] || status;
+        }
+        
+        // 顯示載入狀態
+        function showLoading(show) {
+            const loadingState = document.getElementById('loadingState');
+            const matchesGrid = document.getElementById('matchesGrid');
+            
+            if (show) {
+                loadingState.style.display = 'block';
+                matchesGrid.style.display = 'none';
+            } else {
+                loadingState.style.display = 'none';
+                matchesGrid.style.display = 'grid';
+            }
+        }
+        
+        // 顯示空狀態
+        function showEmptyState() {
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('matchesGrid').style.display = 'none';
+            document.getElementById('pagination').style.display = 'none';
+        }
+        
+        // 隱藏空狀態
+        function hideEmptyState() {
+            document.getElementById('emptyState').style.display = 'none';
+        }
+        
+        // 啟動倒數計時
+        function startCountdowns() {
+            const countdownElements = document.querySelectorAll('[data-date]');
+            
+            countdownElements.forEach(element => {
+                const targetDate = new Date(element.getAttribute('data-date'));
+                
+                const updateCountdown = () => {
+                    const now = new Date();
+                    const diff = targetDate - now;
+                    
+                    if (diff > 0) {
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        let countdown = '';
+                        if (days > 0) countdown += `${days}天 `;
+                        if (hours > 0) countdown += `${hours}時 `;
+                        countdown += `${minutes}分`;
+                        
+                        element.textContent = countdown;
+                    } else {
+                        element.textContent = '比賽即將開始';
+                    }
+                };
+                
+                updateCountdown();
+                setInterval(updateCountdown, 60000); // 每分鐘更新
+            });
+        }
+        
+        // 漢堡選單功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

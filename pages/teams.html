@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隊伍介紹 - 英雄聯盟電競資訊網</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <style>
+        /* 隊伍頁面專用樣式 */
+        .teams-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .teams-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .teams-title {
+            color: var(--gold-color);
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .teams-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .teams-filters {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .region-filter {
+            padding: 12px 24px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .region-filter:hover {
+            border-color: var(--gold-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .region-filter.active {
+            background: var(--gold-color);
+            color: var(--bg-color);
+            border-color: var(--gold-color);
+        }
+        
+        .teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .team-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(200,155,60,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .team-card:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .team-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold-color);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .team-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .team-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--gold-color);
+            object-fit: cover;
+        }
+        
+        .team-basic-info {
+            flex: 1;
+        }
+        
+        .team-name {
+            color: var(--gold-color);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .team-region {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .team-founded {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .team-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            color: var(--gold-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        .team-players {
+            margin-bottom: 20px;
+        }
+        
+        .players-title {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .players-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        
+        .player-item {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .player-item:hover {
+            background: rgba(200,155,60,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .player-role {
+            color: var(--gold-color);
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .player-name {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .team-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .action-btn.primary {
+            background: var(--gold-color);
+            color: var(--bg-color);
+        }
+        
+        .action-btn.secondary {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--gold-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state h3 {
+            color: var(--gold-color);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+        
+        .pagination-btn {
+            padding: 10px 15px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .pagination-btn:hover {
+            border-color: var(--gold-color);
+            background: rgba(200,155,60,0.1);
+        }
+        
+        .pagination-btn.active {
+            background: var(--gold-color);
+            color: var(--bg-color);
+            border-color: var(--gold-color);
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .teams-container {
+                padding: 20px 15px;
+            }
+            
+            .teams-title {
+                font-size: 2rem;
+            }
+            
+            .teams-filters {
+                gap: 10px;
+            }
+            
+            .region-filter {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .teams-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .team-card {
+                padding: 20px;
+            }
+            
+            .team-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .team-logo {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .team-name {
+                font-size: 1.5rem;
+            }
+            
+            .team-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .players-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .action-btn {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">
+                    <h2>LoL Esports</h2>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html">首頁</a></li>
+                <li><a href="matches.html">賽事</a></li>
+                <li><a href="teams.html" class="active">隊伍</a></li>
+                <li><a href="players.html">選手</a></li>
+                <li><a href="favorites.html">收藏</a></li>
+            </ul>
+            <div class="nav-auth">
+                <a href="login.html" class="login-btn">登入</a>
+                <a href="register.html" class="register-btn">註冊</a>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="teams-container">
+        <!-- 頁面標題 -->
+        <div class="teams-header">
+            <h1 class="teams-title">🏆 世界頂尖隊伍</h1>
+            <p class="teams-subtitle">探索來自世界各地的頂尖英雄聯盟戰隊</p>
+        </div>
+        
+        <!-- 地區篩選 -->
+        <div class="teams-filters">
+            <div class="region-filter active" data-region="all">全部地區</div>
+            <div class="region-filter" data-region="LCK">LCK</div>
+            <div class="region-filter" data-region="LPL">LPL</div>
+            <div class="region-filter" data-region="LEC">LEC</div>
+            <div class="region-filter" data-region="LCS">LCS</div>
+            <div class="region-filter" data-region="PCS">PCS</div>
+            <div class="region-filter" data-region="VCS">VCS</div>
+        </div>
+        
+        <!-- 載入中狀態 -->
+        <div class="loading" id="loadingState">
+            <div class="loading-spinner"></div>
+            <p>載入隊伍資料中...</p>
+        </div>
+        
+        <!-- 隊伍網格 -->
+        <div class="teams-grid" id="teamsGrid" style="display: none;">
+            <!-- 隊伍卡片會動態載入 -->
+        </div>
+        
+        <!-- 空狀態 -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <h3>找不到符合條件的隊伍</h3>
+            <p>請嘗試選擇其他地區或稍後再試</p>
+        </div>
+        
+        <!-- 分頁控制 -->
+        <div class="pagination" id="pagination" style="display: none;">
+            <!-- 分頁按鈕會動態載入 -->
+        </div>
+    </div>
+
+    <script>
+        // 全域變數
+        const API_BASE_URL = 'http://localhost:5000';
+        let currentPage = 1;
+        let currentRegion = 'all';
+        let totalPages = 1;
+        
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTeams();
+            initializeFilters();
+        });
+        
+        // 初始化篩選器
+        function initializeFilters() {
+            const regionFilters = document.querySelectorAll('.region-filter');
+            
+            regionFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    const region = this.dataset.region;
+                    selectRegion(region);
+                });
+            });
+        }
+        
+        // 選擇地區
+        function selectRegion(region) {
+            currentRegion = region;
+            currentPage = 1;
+            
+            // 更新篩選器狀態
+            document.querySelectorAll('.region-filter').forEach(filter => {
+                filter.classList.remove('active');
+            });
+            
+            document.querySelector(`[data-region="${region}"]`).classList.add('active');
+            
+            // 重新載入隊伍
+            loadTeams();
+        }
+        
+        // 載入隊伍資料
+        async function loadTeams() {
+            showLoading();
+            
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: 6
+                });
+                
+                if (currentRegion !== 'all') {
+                    params.append('region', currentRegion);
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/api/teams?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayTeams(data.data);
+                    totalPages = data.pagination.total_pages;
+                    updatePagination();
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('載入隊伍資料失敗:', error);
+                showEmptyState();
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // 顯示隊伍
+        function displayTeams(teams) {
+            const teamsGrid = document.getElementById('teamsGrid');
+            
+            if (teams.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            const html = teams.map(team => `
+                <div class="team-card" onclick="viewTeamDetail('${team.id}')">
+                    <div class="team-header">
+                        <img src="${team.logo || '../images/default-team.png'}" alt="${team.name}" class="team-logo">
+                        <div class="team-basic-info">
+                            <h3 class="team-name">${team.name}</h3>
+                            <div class="team-region">${team.region}</div>
+                            <div class="team-founded">成立於 ${team.founded_year || 'N/A'}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="team-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${team.wins || 0}</div>
+                            <div class="stat-label">勝場</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${team.losses || 0}</div>
+                            <div class="stat-label">敗場</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${team.win_rate || 0}%</div>
+                            <div class="stat-label">勝率</div>
+                        </div>
+                    </div>
+                    
+                    <div class="team-players">
+                        <div class="players-title">目前陣容</div>
+                        <div class="players-list">
+                            ${generatePlayersList(team.players || [])}
+                        </div>
+                    </div>
+                    
+                    <div class="team-actions">
+                        <a href="team-detail.html?id=${team.id}" class="action-btn primary">查看詳情</a>
+                        <button class="action-btn secondary" onclick="followTeam('${team.id}', event)">關注</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            teamsGrid.innerHTML = html;
+            teamsGrid.style.display = 'grid';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+        
+        // 生成選手列表
+        function generatePlayersList(players) {
+            const positions = ['TOP', 'JUG', 'MID', 'ADC', 'SUP'];
+            
+            return positions.map(position => {
+                const player = players.find(p => p.position === position);
+                return `
+                    <div class="player-item">
+                        <div class="player-role">${position}</div>
+                        <div class="player-name">${player ? player.name : 'TBD'}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 查看隊伍詳情
+        function viewTeamDetail(teamId) {
+            window.location.href = `team-detail.html?id=${teamId}`;
+        }
+        
+        // 關注隊伍
+        async function followTeam(teamId, event) {
+            event.stopPropagation();
+            
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('請先登入');
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/api/teams/${teamId}/follow`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('已關注該隊伍');
+                    // 更新按鈕狀態
+                    event.target.textContent = '已關注';
+                    event.target.classList.add('active');
+                } else {
+                    alert(data.message || '關注失敗');
+                }
+            } catch (error) {
+                console.error('關注隊伍失敗:', error);
+                alert('關注失敗，請重試');
+            }
+        }
+        
+        // 更新分頁
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            let html = '';
+            
+            // 上一頁按鈕
+            html += `
+                <button class="pagination-btn" onclick="changePage(${currentPage - 1})" 
+                        ${currentPage === 1 ? 'disabled' : ''}>
+                    上一頁
+                </button>
+            `;
+            
+            // 頁碼按鈕
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<button class="pagination-btn active">${i}</button>`;
+                } else {
+                    html += `<button class="pagination-btn" onclick="changePage(${i})">${i}</button>`;
+                }
+            }
+            
+            // 下一頁按鈕
+            html += `
+                <button class="pagination-btn" onclick="changePage(${currentPage + 1})" 
+                        ${currentPage === totalPages ? 'disabled' : ''}>
+                    下一頁
+                </button>
+            `;
+            
+            pagination.innerHTML = html;
+            pagination.style.display = 'flex';
+        }
+        
+        // 切換頁面
+        function changePage(page) {
+            if (page < 1 || page > totalPages) return;
+            
+            currentPage = page;
+            loadTeams();
+        }
+        
+        // 顯示載入狀態
+        function showLoading() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('teamsGrid').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('pagination').style.display = 'none';
+        }
+        
+        // 隱藏載入狀態
+        function hideLoading() {
+            document.getElementById('loadingState').style.display = 'none';
+        }
+        
+        // 顯示空狀態
+        function showEmptyState() {
+            document.getElementById('teamsGrid').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('pagination').style.display = 'none';
+        }
+        
+        // 漢堡選單功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

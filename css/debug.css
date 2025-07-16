@@ -1,0 +1,20 @@
+/* 圖片路徑測試 - 可以將此CSS加入到style.css中測試 */
+
+/* 替代方案1: 使用絕對路徑 */
+.hero-background-test1 {
+    background: url('/images/lol-hero-bg.jpg') center/cover;
+}
+
+/* 替代方案2: 使用相對路徑 */
+.hero-background-test2 {
+    background: url('../images/lol-hero-bg.jpg') center/cover;
+}
+
+/* 替代方案3: 使用base64編碼（適合小圖片） */
+/* 如果圖片很小，可以考慮將其轉換為base64格式 */
+
+/* 測試背景圖片是否載入成功 */
+.hero-background {
+    /* 添加這個屬性來測試圖片是否載入 */
+    background-color: #ff0000; /* 如果圖片載入失敗，會顯示紅色背景 */
+}
