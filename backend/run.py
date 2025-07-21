@@ -8,11 +8,11 @@ import sys
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from config import config, get_database
-from routes.auth import auth_bp
-from routes.teams import team_bp  
-from routes.players import player_bp
-from routes.matches import match_bp
+from backend.config import config, get_database
+from backend.routes.auth import auth_bp
+from backend.routes.teams import team_bp  
+from backend.routes.players import player_bp
+from backend.routes.matches import match_bp
 
 def create_app(config_name=None):
     """應用程式工廠"""
@@ -22,8 +22,8 @@ def create_app(config_name=None):
     config_name = config_name or os.environ.get('FLASK_CONFIG', 'default')
     app.config.from_object(config[config_name])
     
-    # 設定 CORS
-    CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:5500'])
+    # 設定 CORS（允許所有來源）
+    CORS(app)
     
     # 初始化 JWT
     jwt = JWTManager(app)

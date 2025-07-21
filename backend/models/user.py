@@ -26,8 +26,9 @@ class User:
     
     def save(self):
         """儲存使用者到資料庫"""
+        from ..config import get_database
         try:
-            collection = db.get_db().users
+            collection = get_database().users
             user_data = {
                 'username': self.username,
                 'email': self.email,
@@ -64,8 +65,9 @@ class User:
     @staticmethod
     def find_by_username(username):
         """根據用戶名查找使用者"""
+        from ..config import get_database
         try:
-            collection = db.get_db().users
+            collection = get_database().users
             user_data = collection.find_one({'username': username})
             if user_data:
                 user = User()
@@ -88,8 +90,9 @@ class User:
     @staticmethod
     def find_by_email(email):
         """根據電子郵件查找使用者"""
+        from ..config import get_database
         try:
-            collection = db.get_db().users
+            collection = get_database().users
             user_data = collection.find_one({'email': email})
             if user_data:
                 user = User()
@@ -112,8 +115,9 @@ class User:
     @staticmethod
     def find_by_id(user_id):
         """根據ID查找使用者"""
+        from ..config import get_database
         try:
-            collection = db.get_db().users
+            collection = get_database().users
             user_data = collection.find_one({'_id': ObjectId(user_id)})
             if user_data:
                 user = User()

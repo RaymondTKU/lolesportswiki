@@ -23,8 +23,9 @@
                 <li><a href="pages/favorites.html">收藏</a></li>
             </ul>
             <div class="nav-auth">
-                <button class="btn btn-login" onclick="window.location.href='pages/login.html'">登入</button>
-                <button class="btn btn-register" onclick="window.location.href='pages/register.html'">註冊</button>
+                <div id="auth-area">
+                    <!-- JS 動態插入登入/註冊或用戶名/登出 -->
+                </div>
             </div>
         </div>
     </nav>
@@ -241,5 +242,37 @@
     </footer>
 
     <script src="js/main.js"></script>
+</body>
+<script>
+// 動態顯示登入狀態
+function renderAuthArea() {
+    const authArea = document.getElementById('auth-area');
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    if (token && user) {
+        let username = '';
+        try {
+            username = JSON.parse(user).username || JSON.parse(user).email || '';
+        } catch (e) {
+            username = '';
+        }
+        authArea.innerHTML = `
+            <span class="nav-username">👤 ${username}</span>
+            <button class="btn btn-logout" id="logout-btn">登出</button>
+        `;
+        document.getElementById('logout-btn').onclick = function() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.reload();
+        };
+    } else {
+        authArea.innerHTML = `
+            <button class="btn btn-login" onclick="window.location.href='pages/login.html'">登入</button>
+            <button class="btn btn-register" onclick="window.location.href='pages/register.html'">註冊</button>
+        `;
+    }
+}
+document.addEventListener('DOMContentLoaded', renderAuthArea);
+</script>
 </body>
 </html>

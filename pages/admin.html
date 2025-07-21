@@ -301,11 +301,50 @@
         <!-- 比賽管理面板 -->
         <div class="admin-panel" id="matches">
             <h2 style="color: var(--accent-gold); margin-bottom: 1rem;">比賽管理</h2>
+            <button class="action-btn btn-edit" id="addMatchBtn" style="margin-bottom:1rem;">＋ 新增比賽</button>
             <input type="text" class="search-box" id="matchSearch" placeholder="搜索比賽...">
             <div id="matchesList">
                 <div class="loading">載入中...</div>
             </div>
             <div class="pagination" id="matchesPagination"></div>
+            <!-- 新增/編輯比賽表單彈窗 -->
+            <div id="matchModal" class="modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+              <div class="modal-content" style="background:#222;padding:2rem;border-radius:10px;min-width:320px;max-width:90vw;position:relative;">
+                <span id="closeMatchModal" style="position:absolute;top:10px;right:20px;font-size:2rem;cursor:pointer;color:#fff;">&times;</span>
+                <h3 id="modalTitle" style="color:var(--accent-gold);margin-bottom:1rem;">新增比賽</h3>
+                <form id="matchForm">
+                  <input type="hidden" id="matchId">
+                  <div style="margin-bottom:1rem;">
+                    <label>賽事名稱 <input type="text" id="tournament" required></label>
+                  </div>
+                  <div style="margin-bottom:1rem;">
+                    <label>賽季 <input type="text" id="season" required></label>
+                  </div>
+                  <div style="margin-bottom:1rem;">
+                    <label>比賽日期 <input type="date" id="date" required></label>
+                  </div>
+                  <div style="margin-bottom:1rem;">
+                    <label>隊伍A ID <input type="text" id="team_a_id" required></label>
+                  </div>
+                  <div style="margin-bottom:1rem;">
+                    <label>隊伍B ID <input type="text" id="team_b_id" required></label>
+                  </div>
+                  <div style="margin-bottom:1rem;">
+                    <label>狀態 <input type="text" id="status" value="scheduled"></label>
+                  </div>
+                  <div style="margin-bottom:1rem;">
+                    <label>比賽格式 <input type="text" id="match_format" value="BO3"></label>
+                  </div>
+                  <div style="margin-bottom:1rem;">
+                    <label>場地 <input type="text" id="venue"></label>
+                  </div>
+                  <div style="margin-bottom:1rem;">
+                    <label>備註 <input type="text" id="notes"></label>
+                  </div>
+                  <button type="submit" class="action-btn btn-edit" id="saveMatchBtn">儲存</button>
+                </form>
+              </div>
+            </div>
         </div>
         
         <!-- 評論管理面板 -->
@@ -609,6 +648,7 @@
                                 <td>${new Date(match.date).toLocaleDateString()}</td>
                                 <td>${match.status || '未開始'}</td>
                                 <td>
+                                    <button class="action-btn btn-edit" onclick="openEditMatchModal('${match._id}')">編輯</button>
                                     <button class="action-btn btn-delete" onclick="deleteMatch('${match._id}')">刪除</button>
                                 </td>
                             </tr>
@@ -616,7 +656,6 @@
                     </tbody>
                 </table>
             `;
-            
             container.innerHTML = html;
         }
         
@@ -926,6 +965,84 @@
             this.searchTimeout = setTimeout(() => {
                 loadMatches(1, searchTerm);
             }, 500);
+        });
+        // 新增/編輯比賽互動
+        document.getElementById('addMatchBtn').addEventListener('click', function() {
+          openMatchModal();
+        });
+        document.getElementById('closeMatchModal').addEventListener('click', function() {
+          closeMatchModal();
+        });
+        document.getElementById('matchModal').addEventListener('click', function(e) {
+          if (e.target === this) closeMatchModal();
+        });
+        function openMatchModal() {
+          document.getElementById('modalTitle').textContent = '新增比賽';
+          document.getElementById('matchForm').reset();
+          document.getElementById('matchId').value = '';
+          document.getElementById('matchModal').style.display = 'flex';
+        }
+        function closeMatchModal() {
+          document.getElementById('matchModal').style.display = 'none';
+        }
+        // 編輯比賽
+        window.openEditMatchModal = function(matchId) {
+          const token = localStorage.getItem('token');
+          fetch(`/api/matches/${matchId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+          .then(r=>r.json()).then(res=>{
+            if(res.data){
+              document.getElementById('modalTitle').textContent = '編輯比賽';
+              document.getElementById('matchId').value = res.data._id;
+              document.getElementById('tournament').value = res.data.tournament||'';
+              document.getElementById('season').value = res.data.season||'';
+              document.getElementById('date').value = res.data.date?res.data.date.substr(0,10):'';
+              document.getElementById('team_a_id').value = res.data.team_a_id||'';
+              document.getElementById('team_b_id').value = res.data.team_b_id||'';
+              document.getElementById('status').value = res.data.status||'';
+              document.getElementById('match_format').value = res.data.match_format||'';
+              document.getElementById('venue').value = res.data.venue||'';
+              document.getElementById('notes').value = res.data.notes||'';
+              document.getElementById('matchModal').style.display = 'flex';
+            }
+          });
+        }
+        // 表單送出
+        document.getElementById('matchForm').addEventListener('submit', function(e){
+          e.preventDefault();
+          const token = localStorage.getItem('token');
+          const id = document.getElementById('matchId').value;
+          const data = {
+            tournament: document.getElementById('tournament').value,
+            season: document.getElementById('season').value,
+            date: document.getElementById('date').value,
+            team_a_id: document.getElementById('team_a_id').value,
+            team_b_id: document.getElementById('team_b_id').value,
+            status: document.getElementById('status').value,
+            match_format: document.getElementById('match_format').value,
+            venue: document.getElementById('venue').value,
+            notes: document.getElementById('notes').value
+          };
+          let url = '/api/matches', method = 'POST';
+          if(id){ url += '/' + id; method = 'PUT'; }
+          fetch(url, {
+            method: method,
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+          .then(r=>r.json()).then(res=>{
+            if(res.success){
+              showSuccess('儲存成功');
+              closeMatchModal();
+              loadMatches(currentPage.matches);
+            }else{
+              showError(res.message||'儲存失敗');
+            }
+          }).catch(()=>showError('儲存失敗'));
         });
     </script>
 </body>

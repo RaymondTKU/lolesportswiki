@@ -5,7 +5,7 @@ from pymongo import MongoClient
 class Config:
     """基本配置"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'lol-esports-secret-key-2024'
-    MONGODB_URI = os.environ.get('MONGODB_URI') or 'mongodb://localhost:27017/lolesportswiki'
+    MONGODB_URI = os.environ.get('MONGO_URI') or os.environ.get('MONGODB_URI') or 'mongodb://mongo:27017/lolesportswiki_dev'
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-key-2024'
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     UPLOAD_FOLDER = 'uploads'
@@ -15,17 +15,17 @@ class Config:
 class DevelopmentConfig(Config):
     """開發環境配置"""
     DEBUG = True
-    MONGODB_URI = 'mongodb://localhost:27017/lolesportswiki_dev'
+    MONGODB_URI = 'mongodb://mongo:27017/lolesportswiki_dev'
 
 class ProductionConfig(Config):
     """生產環境配置"""
     DEBUG = False
-    MONGODB_URI = os.environ.get('MONGODB_URI') or 'mongodb://localhost:27017/lolesportswiki'
+    MONGODB_URI = os.environ.get('MONGO_URI') or os.environ.get('MONGODB_URI') or 'mongodb://mongo:27017/lolesportswiki'
 
 class TestingConfig(Config):
     """測試環境配置"""
     TESTING = True
-    MONGODB_URI = 'mongodb://localhost:27017/lolesportswiki_test'
+    MONGODB_URI = 'mongodb://mongo:27017/lolesportswiki_test'
 
 config = {
     'development': DevelopmentConfig,

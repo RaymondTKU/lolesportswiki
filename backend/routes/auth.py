@@ -93,6 +93,7 @@ def register():
             return jsonify({'message': '註冊失敗'}), 500
             
     except Exception as e:
+        print(e, flush=True)
         return jsonify({'message': f'伺服器錯誤: {str(e)}'}), 500
 
 @auth_bp.route('/login', methods=['POST'])

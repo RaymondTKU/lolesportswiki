@@ -593,6 +593,7 @@
             };
             
             try {
+                // 修正路徑，確保無多餘空格
                 const response = await fetch(`${API_BASE_URL}/auth/register`, {
                     method: 'POST',
                     headers: {
